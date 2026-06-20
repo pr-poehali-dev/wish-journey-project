@@ -10,74 +10,98 @@ export default function Index() {
     { date: '31 мая', event: 'Всемирный\nдень без\nтабака' },
   ];
 
-  // Лепесток как SVG-path
   const renderFlower = () => {
-    const cx = 260, cy = 260, r = 260;
+    const cx = 260, cy = 260;
+    // Центр лепестка — на расстоянии 118px от центра цветка
+    const petalDist = 118;
+    const petalRx = 48, petalRy = 82;
+
     return (
       <svg width="520" height="520" viewBox="0 0 520 520" style={{ display:'block' }}>
-        {/* Радужный фон */}
         <defs>
-          <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#e0f7fa"/>
-            <stop offset="100%" stopColor="#b2ebf2"/>
-          </radialGradient>
           {PETAL_COLORS.map((c, i) => (
-            <radialGradient key={i} id={`pg${i}`} cx="50%" cy="70%" r="60%">
-              <stop offset="0%" stopColor="#fff" stopOpacity="0.6"/>
-              <stop offset="100%" stopColor={c} stopOpacity="0.95"/>
+            <radialGradient key={i} id={`pg${i}`} cx="50%" cy="30%" r="70%">
+              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.55"/>
+              <stop offset="100%" stopColor={c} stopOpacity="1"/>
             </radialGradient>
           ))}
-          <filter id="shadow">
-            <feDropShadow dx="0" dy="2" stdDeviation="6" floodColor="rgba(0,0,0,0.25)"/>
+          <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="3" stdDeviation="5" floodColor="rgba(0,0,0,0.3)"/>
+          </filter>
+          <filter id="textShadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="1" stdDeviation="1.5" floodColor="rgba(0,0,0,0.6)"/>
           </filter>
         </defs>
 
         {/* 7 лепестков */}
         {PETAL_DATES.map((p, i) => {
-          const angle = (360 / 7) * i - 90;
-          const rad = (angle * Math.PI) / 180;
-          const petalW = 95, petalH = 160;
-          const px = cx + Math.cos(rad) * 110;
-          const py = cy + Math.sin(rad) * 110;
-          const textAngle = angle + 90;
+          // Угол лепестка: начинаем сверху (-90°)
+          const angleDeg = (360 / 7) * i - 90;
+          const angleRad = (angleDeg * Math.PI) / 180;
+          // Центр эллипса лепестка
+          const pcx = cx + Math.cos(angleRad) * petalDist;
+          const pcy = cy + Math.sin(angleRad) * petalDist;
+
+          const lines = [...p.date.split('\n'), ...p.event.split('\n')];
+          const lineH = 13;
+          const totalH = lines.length * lineH;
+          const startY = pcy - totalH / 2 + lineH * 0.5;
 
           return (
-            <g key={i} transform={`translate(${cx},${cy}) rotate(${angle + 90})`}>
+            <g key={i}>
+              {/* Лепесток — повёрнутый эллипс */}
               <ellipse
-                cx={0} cy={-(petalH / 2 + 30)}
-                rx={petalW / 2} ry={petalH / 2}
+                cx={pcx} cy={pcy}
+                rx={petalRx} ry={petalRy}
                 fill={`url(#pg${i})`}
-                stroke="white" strokeWidth="2"
+                stroke="white" strokeWidth="2.5"
                 filter="url(#shadow)"
+                transform={`rotate(${angleDeg + 90}, ${pcx}, ${pcy})`}
               />
-              <text
-                x={0}
-                y={-(petalH / 2 + 30)}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                transform={`rotate(${-(angle + 90)} 0 ${-(petalH / 2 + 30)})`}
-                style={{ fontSize: i === 4 ? '9px' : '10px', fontWeight: 800, fill: 'white', fontFamily: 'Arial, sans-serif', letterSpacing: '0.3px' }}
-              >
-                {p.date.split('\n').map((line, li) => (
-                  <tspan key={li} x={0} dy={li === 0 ? `-${(p.date.split('\n').length - 1) * 7}` : '14'}
-                    style={{ fontSize: '9px', fontWeight: 700 }}>{line}</tspan>
-                ))}
-                {p.event.split('\n').map((line, li) => (
-                  <tspan key={`e${li}`} x={0} dy={li === 0 ? '16' : '13'}
-                    style={{ fontSize: i === 4 ? '8px' : '9.5px', fontWeight: 900 }}>{line}</tspan>
-                ))}
-              </text>
+              {/* Текст поверх лепестка — не повёрнутый, читаемый */}
+              {lines.map((line, li) => {
+                const isDate = li < p.date.split('\n').length;
+                return (
+                  <text
+                    key={li}
+                    x={pcx}
+                    y={startY + li * lineH}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    filter="url(#textShadow)"
+                    style={{
+                      fontSize: isDate ? '10px' : '11px',
+                      fontWeight: isDate ? 700 : 900,
+                      fill: 'white',
+                      fontFamily: 'Arial Black, Arial, sans-serif',
+                      letterSpacing: '0.2px',
+                    }}
+                  >
+                    {line}
+                  </text>
+                );
+              })}
             </g>
           );
         })}
 
+        {/* Стебель */}
+        <path d={`M ${cx} ${cy+62} Q ${cx-28} ${cy+185} ${cx-8} ${cy+248}`}
+          stroke="#2E7D32" strokeWidth="13" fill="none" strokeLinecap="round"/>
+        {/* Листья */}
+        <ellipse cx={cx-58} cy={cy+182} rx={40} ry={17}
+          fill="#43A047" transform={`rotate(-42 ${cx-58} ${cy+182})`}/>
+        <ellipse cx={cx+28} cy={cy+218} rx={40} ry={17}
+          fill="#388E3C" transform={`rotate(28 ${cx+28} ${cy+218})`}/>
+
         {/* Сердцевина */}
-        <circle cx={cx} cy={cy} r={62} fill="#FFD600" filter="url(#shadow)" />
-        <circle cx={cx} cy={cy} r={48} fill="#FFF176" />
-        <text x={cx} y={cy - 8} textAnchor="middle" style={{ fontSize:'9px', fontWeight:800, fill:'#5D4037', fontFamily:'Arial' }}>Валентин</text>
-        <text x={cx} y={cy + 4} textAnchor="middle" style={{ fontSize:'9px', fontWeight:800, fill:'#5D4037', fontFamily:'Arial' }}>Катаев</text>
-        <text x={cx} y={cy + 17} textAnchor="middle" style={{ fontSize:'7.5px', fontWeight:700, fill:'#E65100', fontFamily:'Arial' }}>«Цветик-</text>
-        <text x={cx} y={cy + 28} textAnchor="middle" style={{ fontSize:'7.5px', fontWeight:700, fill:'#E65100', fontFamily:'Arial' }}>семицветик»</text>
+        <circle cx={cx} cy={cy} r={64} fill="#FFD600" filter="url(#shadow)"/>
+        <circle cx={cx} cy={cy} r={50} fill="#FFF9C4"/>
+        <text x={cx} y={cy-16} textAnchor="middle" style={{ fontSize:'8px', fontWeight:700, fill:'#5D4037', fontFamily:'Arial' }}>Валентин Катаев</text>
+        <text x={cx} y={cy-3} textAnchor="middle" style={{ fontSize:'8.5px', fontWeight:900, fill:'#E65100', fontFamily:'Arial Black, Arial' }}>«Цветик-</text>
+        <text x={cx} y={cy+11} textAnchor="middle" style={{ fontSize:'8.5px', fontWeight:900, fill:'#E65100', fontFamily:'Arial Black, Arial' }}>семицветик»</text>
+        <text x={cx} y={cy+26} textAnchor="middle" style={{ fontSize:'7.5px', fontWeight:700, fill:'#1B5E20', fontFamily:'Arial' }}>Ценность:</text>
+        <text x={cx} y={cy+39} textAnchor="middle" style={{ fontSize:'8px', fontWeight:900, fill:'#1B5E20', fontFamily:'Arial Black, Arial' }}>ЗДОРОВЬЕ</text>
 
         {/* Стебель */}
         <path d={`M ${cx} ${cy+62} Q ${cx-30} ${cy+200} ${cx-10} ${cy+r-10}`}
