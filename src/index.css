@@ -97,5 +97,73 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: "Golos Text", sans-serif;
   }
+}
+
+@layer utilities {
+  .petal-shape {
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  }
+}
+
+@keyframes float-up {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  90% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-120vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes gentle-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(2deg);
+  }
+}
+
+@keyframes petal-reveal {
+  0% {
+    transform: scale(0.85) translateY(20px);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 28px rgba(255, 255, 255, 0.8));
+  }
+}
+
+.animate-float-up {
+  animation: float-up linear infinite;
+}
+.animate-gentle-float {
+  animation: gentle-float 6s ease-in-out infinite;
+}
+.animate-petal-reveal {
+  animation: petal-reveal 0.5s ease-out;
+}
+.animate-shimmer {
+  animation: shimmer 3s ease-in-out infinite;
 }
