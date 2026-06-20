@@ -1,320 +1,324 @@
-import { useState } from 'react';
-
 const FLOWER_IMG =
   'https://cdn.poehali.dev/projects/6cc2ebe8-a376-4757-b8bb-4c615959cef1/bucket/7f0f6d19-e7cd-40b1-b9bc-1ffe33292b91.jpg';
 
 const PETAL_COLORS = ['#FF5B5B','#FF9933','#FFD700','#4CAF50','#2196F3','#9C27B0','#E91E8C'];
 
-const CALENDAR = [
-  { date: '7 апр', event: 'День Здоровья, Благовещенье', color: '#FF5B5B' },
-  { date: '14 апр', event: 'День воздушного шара', color: '#FF9933' },
-  { date: '22 апр', event: 'День Матери-Земли', color: '#FFD700' },
-  { date: '28 апр', event: 'День скорой помощи', color: '#4CAF50' },
-  { date: '7 мая', event: 'День радио', color: '#2196F3' },
-  { date: '9 мая', event: 'День Победы', color: '#9C27B0' },
-  { date: '25 мая', event: 'День химика', color: '#E91E8C' },
-  { date: '31 мая', event: 'Всемирный день без табака', color: '#FF5B5B' },
-];
-
-const EVENTS = [
-  { date: '7 апреля', color: '#FF5B5B', emoji: '🌿', title: 'Фестиваль здоровья', subtitle: '«Гармония духа и тела»' },
-  { date: '28 апреля', color: '#4CAF50', emoji: '🎤', title: 'Фестиваль агитбригад', subtitle: '«Молодость выбирает здоровье»' },
-  { date: '25 мая', color: '#9C27B0', emoji: '⚗️', title: 'Защита проектов', subtitle: '«Витамин vs Никотин»' },
-];
-
-const QUESTIONS = [
-  'Встречались ли тебе люди, которые добровольно «отнимали у себя» здоровье? Почему они это делали?',
-  'В какой момент вредная привычка превращается из личного дела в проблему близких?',
-  'Что сложнее: вернуть здоровье после злоупотребления или беречь то, что дано от природы?',
-];
-
-type Tab = 'poster' | 'events' | 'questions';
-
 export default function Index() {
-  const [tab, setTab] = useState<Tab>('poster');
-
   return (
-    <div className="min-h-screen bg-[#f8f3ff] font-sans">
-
-      {/* Навигация */}
-      <div className="sticky top-0 z-20 flex justify-center gap-2 py-3 bg-white/80 backdrop-blur border-b border-purple-100 shadow-sm">
-        {([['poster','🌸 Паспорт-постер'],['events','⭐ Ключевые дела'],['questions','💬 Вопросы']] as [Tab, string][]).map(([id, label]) => (
-          <button key={id} onClick={() => setTab(id)}
-            className="px-5 py-2 rounded-full text-sm font-600 transition-all duration-200"
-            style={tab === id
-              ? { background: 'linear-gradient(135deg,#D97A8E,#9C27B0)', color: '#fff', boxShadow: '0 4px 14px rgba(156,39,176,0.35)' }
-              : { color: '#7B5EA7', background: '#F3EEFF' }}>
-            {label}
-          </button>
-        ))}
-        <a href="javascript:window.print()"
-          className="px-5 py-2 rounded-full text-sm font-600 bg-[#4CAF50] text-white hover:bg-[#43A047] transition-colors"
-          style={{ boxShadow: '0 4px 14px rgba(76,175,80,0.35)' }}>
-          🖨️ Печать
-        </a>
+    <>
+      {/* Кнопка печати — не попадает в PDF */}
+      <div className="print:hidden fixed top-4 right-4 z-50 flex gap-2">
+        <button
+          onClick={() => window.print()}
+          className="px-6 py-3 rounded-xl text-white font-700 text-base shadow-xl hover:scale-105 transition-transform"
+          style={{ background: 'linear-gradient(135deg,#9C27B0,#D97A8E)' }}
+        >
+          🖨️ Сохранить / Распечатать А3
+        </button>
       </div>
 
-      {/* ПОСТЕР */}
-      {tab === 'poster' && (
-        <div id="passport-poster" className="max-w-4xl mx-auto p-6">
+      {/* Инструкция — не попадает в PDF */}
+      <div className="print:hidden fixed top-4 left-4 z-50 bg-white rounded-xl shadow-lg p-4 text-xs text-gray-600 max-w-xs border border-purple-100">
+        <p className="font-700 text-sm text-[#9C27B0] mb-1">📄 Как сохранить как PDF А3:</p>
+        <ol className="space-y-1 list-decimal list-inside">
+          <li>Нажмите кнопку «Сохранить»</li>
+          <li>Принтер → <strong>«Сохранить как PDF»</strong></li>
+          <li>Ещё настройки → Бумага → <strong>A3</strong></li>
+          <li>Ориентация → <strong>Альбомная</strong></li>
+          <li>Поля → <strong>Нет / Минимальные</strong></li>
+          <li>✅ Включить <strong>«Фоновую графику»</strong></li>
+        </ol>
+      </div>
 
-          {/* Шапка с фото */}
-          <div className="relative rounded-3xl overflow-hidden mb-5" style={{ height: '260px' }}>
-            <img src={FLOWER_IMG} alt="" className="absolute inset-0 w-full h-full object-cover object-center" />
-            <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(30,0,60,0.75) 0%, rgba(80,0,40,0.65) 100%)' }} />
+      {/* ===== А3 ПОСТЕР (420 × 297 мм) ===== */}
+      <div
+        id="a3-poster"
+        style={{
+          width: '420mm',
+          minHeight: '297mm',
+          margin: '80px auto 40px',
+          background: 'linear-gradient(135deg, #fdf6ff 0%, #fff8f0 50%, #f0fff8 100%)',
+          fontFamily: "'Golos Text', 'Arial', sans-serif",
+          fontSize: '10pt',
+          position: 'relative',
+          overflow: 'hidden',
+          boxShadow: '0 8px 60px rgba(0,0,0,0.18)',
+        }}
+        className="print:shadow-none print:m-0"
+      >
+        {/* Декоративные круги фона */}
+        <div style={{ position:'absolute', top:'-60px', right:'-60px', width:'300px', height:'300px', borderRadius:'50%', background:'rgba(156,39,176,0.06)', pointerEvents:'none' }} />
+        <div style={{ position:'absolute', bottom:'-80px', left:'-40px', width:'240px', height:'240px', borderRadius:'50%', background:'rgba(76,175,80,0.07)', pointerEvents:'none' }} />
 
-            {/* Цветок SVG поверх */}
-            <div className="absolute right-8 top-1/2 -translate-y-1/2 opacity-90">
-              <svg width="160" height="160" viewBox="0 0 160 160">
-                {PETAL_COLORS.map((c, i) => {
-                  const angle = (360 / 7) * i;
-                  return (
-                    <ellipse key={i} cx="80" cy="37" rx="18" ry="38"
-                      fill={c} fillOpacity="0.92"
-                      style={{ transformOrigin: '80px 80px', transform: `rotate(${angle}deg)` }} />
-                  );
-                })}
+        {/* ====== ШАПКА ====== */}
+        <div style={{ display:'flex', alignItems:'stretch', minHeight:'72mm', position:'relative' }}>
+          {/* Левая полоса — фото */}
+          <div style={{ width:'90mm', position:'relative', flexShrink:0 }}>
+            <img src={FLOWER_IMG} alt="" style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center', display:'block' }} />
+            <div style={{ position:'absolute', inset:0, background:'linear-gradient(135deg,rgba(20,0,40,0.55) 0%,rgba(60,0,80,0.3) 100%)' }} />
+            {/* SVG цветок */}
+            <div style={{ position:'absolute', bottom:'8mm', left:'50%', transform:'translateX(-50%)' }}>
+              <svg width="80" height="80" viewBox="0 0 160 160">
+                {PETAL_COLORS.map((c, i) => (
+                  <ellipse key={i} cx="80" cy="32" rx="18" ry="42"
+                    fill={c} fillOpacity="0.95"
+                    style={{ transformOrigin:'80px 80px', transform:`rotate(${(360/7)*i}deg)` }} />
+                ))}
                 <circle cx="80" cy="80" r="22" fill="#FFD700" />
-                <circle cx="80" cy="80" r="14" fill="#FFF176" />
+                <circle cx="80" cy="80" r="13" fill="#FFF9C4" />
               </svg>
             </div>
-
-            <div className="relative z-10 p-7 h-full flex flex-col justify-between">
-              <div>
-                <div className="inline-block px-3 py-1 rounded-full text-xs font-700 tracking-widest uppercase mb-2"
-                  style={{ background: 'rgba(255,255,255,0.18)', border: '1px solid rgba(255,255,255,0.3)', color: '#fff' }}>
-                  ПАСПОРТ МАТРИЦЫ УЧЕБНОГО ПЕРИОДА · IV ЧЕТВЕРТЬ
-                </div>
-                <h1 className="font-display text-5xl font-700 text-white leading-tight">
-                  Путешествие в страну <span style={{ color: '#FFD700' }}>желаний</span>
-                </h1>
-                <p className="text-white/80 mt-1 font-serif italic text-lg">«Цветик-семицветик» · В. Катаев · Ценность: ЗДОРОВЬЕ</p>
-              </div>
-              <div className="text-white/70 text-xs leading-relaxed">
-                Лабанок Е. Н. — зам. директора по ВР &nbsp;·&nbsp; Таратонова О. В. — советник директора по воспитанию<br />
-                МОУ-СОШ №2 · г. Унеча Брянской области · ул. Луначарского, д. 38 · 7 апреля – 31 мая
-              </div>
-            </div>
           </div>
 
-          {/* Основная сетка */}
-          <div className="grid grid-cols-3 gap-4 mb-4">
+          {/* Правая часть шапки */}
+          <div style={{ flex:1, background:'linear-gradient(135deg,#4A0072,#880E4F)', padding:'8mm 10mm 6mm 10mm', display:'flex', flexDirection:'column', justifyContent:'space-between', color:'#fff' }}>
+            <div>
+              <div style={{ display:'inline-block', background:'rgba(255,255,255,0.15)', border:'1px solid rgba(255,255,255,0.3)', borderRadius:'20px', padding:'2px 12px', fontSize:'7pt', letterSpacing:'2px', textTransform:'uppercase', marginBottom:'4mm' }}>
+                ПАСПОРТ МАТРИЦЫ УЧЕБНОГО ПЕРИОДА · IV ЧЕТВЕРТЬ · 7 апреля – 31 мая
+              </div>
+              <div style={{ fontSize:'28pt', fontFamily:"'Caveat','cursive'", lineHeight:1.1, marginBottom:'3mm' }}>
+                Путешествие в страну <span style={{ color:'#FFD700' }}>желаний</span>
+              </div>
+              <div style={{ fontSize:'11pt', fontStyle:'italic', opacity:0.85, marginBottom:'3mm', fontFamily:"'Cormorant','serif'" }}>
+                «Цветик-семицветик» · Валентин Катаев · Ценность: <strong>ЗДОРОВЬЕ</strong> · Тема: <strong>ПОБЕДА</strong>
+              </div>
+            </div>
+            <div style={{ fontSize:'8pt', opacity:0.75, lineHeight:1.6 }}>
+              <strong>Лабанок Елена Николаевна</strong> — заместитель директора по воспитательной работе<br/>
+              <strong>Таратонова Ольга Витальевна</strong> — советник директора по воспитанию и взаимодействию с детскими общественными объединениями<br/>
+              МОУ-СОШ №2 · Брянская область, г. Унеча, ул. Луначарского, д. 38
+            </div>
+          </div>
+        </div>
+
+        {/* ====== ОСНОВНАЯ СЕТКА ====== */}
+        <div style={{ display:'grid', gridTemplateColumns:'68mm 1fr 1fr', gap:'4mm', padding:'5mm 6mm 4mm' }}>
+
+          {/* КОЛОНКА 1 — школа + контингент */}
+          <div style={{ display:'flex', flexDirection:'column', gap:'3mm' }}>
 
             {/* Школа */}
-            <div className="col-span-2 rounded-2xl p-5 bg-white border border-purple-100 shadow-sm">
-              <p className="text-xs uppercase tracking-widest text-[#9C27B0] font-700 mb-3">Образовательная организация</p>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-0.5">Полное наименование</p>
-                  <p className="text-sm text-gray-700 font-500 leading-snug">МОУ-СОШ №2 г. Унеча Брянской области</p>
+            <div style={{ background:'white', borderRadius:'6px', padding:'4mm', border:'1.5px solid #EDE0FF', boxShadow:'0 1px 6px rgba(0,0,0,0.06)' }}>
+              <div style={{ fontSize:'6pt', textTransform:'uppercase', letterSpacing:'1.5px', color:'#9C27B0', fontWeight:700, marginBottom:'2mm' }}>🏫 Образовательная организация</div>
+              <div style={{ fontSize:'8.5pt', fontWeight:700, color:'#3A1060', marginBottom:'1.5mm', lineHeight:1.3 }}>МОУ-СОШ №2 г. Унеча<br/>Брянской области</div>
+              <div style={{ fontSize:'7.5pt', color:'#555', lineHeight:1.5 }}>ул. Луначарского, д. 38<br/>Городская школа в центре — конкурентная среда с двумя соседними школами</div>
+            </div>
+
+            {/* Контингент */}
+            <div style={{ background:'white', borderRadius:'6px', padding:'4mm', border:'1.5px solid #EDE0FF', boxShadow:'0 1px 6px rgba(0,0,0,0.06)' }}>
+              <div style={{ fontSize:'6pt', textTransform:'uppercase', letterSpacing:'1.5px', color:'#9C27B0', fontWeight:700, marginBottom:'2mm' }}>👥 Обучающихся</div>
+              {[
+                ['Всего', '484', '#9C27B0'],
+                ['Классов', '20', '#E91E8C'],
+                ['1–4 кл.', '177', '#FF5B5B'],
+                ['5–9 кл.', '248', '#FF9933'],
+                ['10–11 кл.', '59', '#4CAF50'],
+                ['Дети ОВЗ', '7', '#2196F3'],
+                ['Семьи СВО', '29', '#FF5B5B'],
+              ].map(([l,n,c]) => (
+                <div key={l} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', borderBottom:'1px solid #F3EAF8', padding:'1.5mm 0' }}>
+                  <span style={{ fontSize:'7.5pt', color:'#555' }}>{l}</span>
+                  <span style={{ fontSize:'11pt', fontWeight:800, color: c as string, fontFamily:"'Caveat','cursive'" }}>{n}</span>
                 </div>
-                <div>
-                  <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-0.5">Адрес</p>
-                  <p className="text-sm text-gray-700 font-500 leading-snug">Брянская обл., г. Унеча, ул. Луначарского, д. 38</p>
+              ))}
+            </div>
+
+            {/* Инфраструктура */}
+            <div style={{ background:'white', borderRadius:'6px', padding:'4mm', border:'1.5px solid #EDE0FF', boxShadow:'0 1px 6px rgba(0,0,0,0.06)' }}>
+              <div style={{ fontSize:'6pt', textTransform:'uppercase', letterSpacing:'1.5px', color:'#4CAF50', fontWeight:700, marginBottom:'2mm' }}>🏟️ Инфраструктура</div>
+              {['Школьный стадион','Актовый зал','Спортивный зал','Скалодром','Баскетбольная площадка'].map(s => (
+                <div key={s} style={{ fontSize:'7.5pt', color:'#444', padding:'1mm 0', borderBottom:'1px solid #F0F0F0', display:'flex', alignItems:'center', gap:'4px' }}>
+                  <span style={{ color:'#FFD700', fontSize:'8pt' }}>★</span> {s}
                 </div>
-                <div>
-                  <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-0.5">Инфраструктура</p>
-                  <p className="text-sm text-gray-600 leading-snug">Стадион, актовый зал, спортзал, скалодром, баскетбольная площадка</p>
+              ))}
+            </div>
+
+            {/* Партнёры */}
+            <div style={{ background:'white', borderRadius:'6px', padding:'4mm', border:'1.5px solid #EDE0FF', boxShadow:'0 1px 6px rgba(0,0,0,0.06)' }}>
+              <div style={{ fontSize:'6pt', textTransform:'uppercase', letterSpacing:'1.5px', color:'#2196F3', fontWeight:700, marginBottom:'2mm' }}>🤝 Партнёры</div>
+              {['Кинотеатр «МИР»','Этнокомплекс «Брянское подворье»','Унечский краеведческий музей','Воскресная школа при Храме Святителя Николая'].map(s => (
+                <div key={s} style={{ fontSize:'7.5pt', color:'#444', padding:'1mm 0', borderBottom:'1px solid #F0F0F0', display:'flex', alignItems:'center', gap:'4px' }}>
+                  <span style={{ color:'#2196F3', fontSize:'8pt' }}>◆</span> {s}
                 </div>
-                <div>
-                  <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-0.5">Партнёры</p>
-                  <p className="text-sm text-gray-600 leading-snug">Кинотеатр «МИР», этнокомплекс «Брянское подворье», краеведческий музей, воскресная школа</p>
-                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* КОЛОНКА 2 */}
+          <div style={{ display:'flex', flexDirection:'column', gap:'3mm' }}>
+
+            {/* Проблема + Цель */}
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'3mm' }}>
+              <div style={{ background:'#FFF5F5', borderRadius:'6px', padding:'4mm', border:'2px solid #FFCDD2' }}>
+                <div style={{ fontSize:'6pt', textTransform:'uppercase', letterSpacing:'1px', color:'#E53935', fontWeight:700, marginBottom:'1.5mm' }}>⚠️ Воспитательная проблема</div>
+                <div style={{ fontSize:'7.5pt', color:'#4A0000', lineHeight:1.5 }}>Повышение интереса подростков к употреблению вейпов среди учеников 5–8 классов.</div>
+              </div>
+              <div style={{ background:'#F1FFF5', borderRadius:'6px', padding:'4mm', border:'2px solid #C8E6C9' }}>
+                <div style={{ fontSize:'6pt', textTransform:'uppercase', letterSpacing:'1px', color:'#2E7D32', fontWeight:700, marginBottom:'1.5mm' }}>🎯 Цель матрицы</div>
+                <div style={{ fontSize:'7.5pt', color:'#1A3A1A', lineHeight:1.5 }}>Создание условий для снижения интереса к употреблению вейпов среди учеников 5–8 классов.</div>
               </div>
             </div>
 
-            {/* Статистика */}
-            <div className="rounded-2xl p-5 bg-white border border-purple-100 shadow-sm flex flex-col gap-2">
-              <p className="text-xs uppercase tracking-widest text-[#9C27B0] font-700 mb-1">Контингент</p>
-              {[
-                { n: '484', label: 'Обучающихся', c: '#FF5B5B' },
-                { n: '20', label: 'Классов', c: '#FF9933' },
-                { n: '177', label: '1–4 классы', c: '#FFD700' },
-                { n: '248', label: '5–9 классы', c: '#4CAF50' },
-                { n: '59', label: '10–11 классы', c: '#2196F3' },
-                { n: '29', label: 'Дети семей СВО', c: '#9C27B0' },
-                { n: '7', label: 'Дети с ОВЗ', c: '#E91E8C' },
-              ].map(s => (
-                <div key={s.n} className="flex items-center justify-between">
-                  <span className="text-xs text-gray-500">{s.label}</span>
-                  <span className="font-display text-xl font-700" style={{ color: s.c }}>{s.n}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Проблема и цель */}
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div className="rounded-2xl p-5 border-2 border-red-200 bg-red-50">
-              <p className="text-xs uppercase tracking-widest text-red-500 font-700 mb-2">⚠️ Воспитательная проблема</p>
-              <p className="text-sm text-gray-700 leading-relaxed">Повышение уровня интереса подростков к употреблению вейпов (электронных сигарет) среди учеников 5–8 классов.</p>
-            </div>
-            <div className="rounded-2xl p-5 border-2 border-green-200 bg-green-50">
-              <p className="text-xs uppercase tracking-widest text-green-600 font-700 mb-2">🎯 Цель матрицы</p>
-              <p className="text-sm text-gray-700 leading-relaxed">Создание условий для снижения интереса подростков к употреблению вейпов среди учеников 5–8 классов.</p>
-            </div>
-          </div>
-
-          {/* Сюжет */}
-          <div className="rounded-2xl p-5 bg-white border border-purple-100 shadow-sm mb-4">
-            <p className="text-xs uppercase tracking-widest text-[#9C27B0] font-700 mb-2">🧩 Игровой сюжет</p>
-            <p className="text-sm text-gray-700 leading-relaxed">
-              Ученики 5–8 классов попадают в <strong>«страну здоровья»</strong>. Каждому классу даётся «Цветик-семицветик» — каждый лепесток это коллективный бонус за хорошую дисциплину и ведение ЗОЖ. Бонусами класс воспользуется в следующем учебном году. Ошибка одного ученика может «сжечь» лепесток для всего класса. За день до ключевого дела — открытый микрофон с проблемными вопросами.
-            </p>
-          </div>
-
-          {/* Ключевые дела */}
-          <div className="grid grid-cols-3 gap-4 mb-4">
-            {EVENTS.map((e, i) => (
-              <div key={i} className="rounded-2xl p-4 text-white text-center"
-                style={{ background: `linear-gradient(135deg, ${e.color}EE, ${e.color}AA)` }}>
-                <div className="text-3xl mb-2">{e.emoji}</div>
-                <p className="text-xs opacity-80 mb-1">{e.date}</p>
-                <p className="font-700 text-sm leading-snug">{e.title}</p>
-                <p className="text-xs opacity-85 mt-1">{e.subtitle}</p>
+            {/* Сюжет */}
+            <div style={{ background:'white', borderRadius:'6px', padding:'4mm', border:'1.5px solid #EDE0FF', boxShadow:'0 1px 6px rgba(0,0,0,0.06)' }}>
+              <div style={{ fontSize:'6pt', textTransform:'uppercase', letterSpacing:'1.5px', color:'#9C27B0', fontWeight:700, marginBottom:'2mm' }}>🧩 Игровой сюжет матрицы</div>
+              <div style={{ fontSize:'7.5pt', color:'#333', lineHeight:1.6 }}>
+                Ученики 5–8 классов попадают в <strong>«страну здоровья»</strong>. Каждому классу даётся «Цветик-семицветик» — каждый лепесток это коллективный бонус за хорошую дисциплину и ведение ЗОЖ. Бонусами класс воспользуется в следующем учебном году. Ошибка одного ученика может «сжечь» лепесток для всего класса. За день до ключевого дела — <strong>открытый микрофон</strong> с проблемными вопросами.
               </div>
-            ))}
-          </div>
-
-          {/* Календарь */}
-          <div className="rounded-2xl p-5 bg-white border border-purple-100 shadow-sm mb-4">
-            <p className="text-xs uppercase tracking-widest text-[#9C27B0] font-700 mb-3">📅 Календарь учебного периода</p>
-            <div className="grid grid-cols-4 gap-2">
-              {CALENDAR.map((c, i) => (
-                <div key={i} className="rounded-xl p-3 text-center" style={{ background: `${c.color}18`, border: `1px solid ${c.color}44` }}>
-                  <p className="font-700 text-sm" style={{ color: c.color }}>{c.date}</p>
-                  <p className="text-[11px] text-gray-600 leading-snug mt-0.5">{c.event}</p>
-                </div>
-              ))}
             </div>
-          </div>
 
-          {/* Рефлексия */}
-          <div className="rounded-2xl p-5 border-2 mb-4"
-            style={{ background: 'linear-gradient(135deg,#f3e8ff,#ffe8f0)', borderColor: '#D97A8E55' }}>
-            <p className="text-xs uppercase tracking-widest text-[#D97A8E] font-700 mb-3">🎒 Рефлексия · 31 мая — Поход с классом</p>
-            <div className="grid grid-cols-3 gap-3">
+            {/* Ключевые дела */}
+            <div style={{ background:'white', borderRadius:'6px', padding:'4mm', border:'1.5px solid #EDE0FF', boxShadow:'0 1px 6px rgba(0,0,0,0.06)' }}>
+              <div style={{ fontSize:'6pt', textTransform:'uppercase', letterSpacing:'1.5px', color:'#E91E8C', fontWeight:700, marginBottom:'2mm' }}>⭐ Ключевые дела периода</div>
               {[
-                { e: '🧳', n: 'Чемодан', d: 'Ценная информация, которую возьмёшь с собой в жизнь' },
-                { e: '⚙️', n: 'Мясорубка', d: 'То, что нужно обдумать и переработать' },
-                { e: '🗑️', n: 'Корзина', d: 'Что показалось ненужным или бесполезным' },
-              ].map(r => (
-                <div key={r.n} className="rounded-xl p-3 bg-white/70 text-center">
-                  <div className="text-2xl mb-1">{r.e}</div>
-                  <p className="font-700 text-sm text-gray-700">{r.n}</p>
-                  <p className="text-[11px] text-gray-500 mt-0.5 leading-snug">{r.d}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Цитата */}
-          <div className="rounded-2xl p-5 text-center" style={{ background: 'linear-gradient(135deg,#fff9e6,#fff3d0)', border: '2px solid #FFD70055' }}>
-            <p className="font-serif text-lg italic text-[#8B6914]">
-              «Здоровье — это тот подарок, который можно подарить себе, а можно и отнять у самого себя»
-            </p>
-            <p className="text-sm text-[#B8963A] mt-1 font-600">— Франсуа де Ларошфуко</p>
-          </div>
-
-          {/* Подсказка по скриншоту */}
-          <div className="mt-6 text-center text-xs text-gray-400 pb-4">
-            Для сохранения как картинку: нажмите <kbd className="px-1.5 py-0.5 rounded bg-gray-100 border text-gray-500 font-mono">🖨️ Печать</kbd> выше → «Сохранить как PDF» → или используйте расширение браузера «Full Page Screenshot»
-          </div>
-        </div>
-      )}
-
-      {/* КЛЮЧЕВЫЕ ДЕЛА */}
-      {tab === 'events' && (
-        <div className="max-w-4xl mx-auto p-6 space-y-6">
-          {[
-            {
-              color: '#FF5B5B', emoji: '🌿', date: '7 апреля',
-              title: 'Фестиваль здоровья «Гармония духа и тела»',
-              goal: 'Показать взаимосвязь духовного и физического здоровья.',
-              stations: [
-                { n: '📚 Истоки здоровья', d: 'Викторина о питании, режиме дня. Диалог о влиянии стресса на организм.' },
-                { n: '🕊️ Голубь благой вести', d: 'Мастер-класс: бумажные голуби с добрыми пожеланиями. Традиции Благовещения.' },
-                { n: '🏃 Движение — жизнь!', d: 'Спортивные конкурсы, мастер-класс по гимнастике. Команды «Яблоко» и «Голубь».' },
-                { n: '🍯 Хлеб да соль', d: 'Дегустация орехов, сухофруктов, мёда. Традиционная постная выпечка.' },
-              ],
-              finale: 'Ритуал «Выпускание голубей» + флешмоб + раздача буклетов с рецептами полезного чая.'
-            },
-            {
-              color: '#4CAF50', emoji: '🎤', date: '28 апреля',
-              title: 'Фестиваль агитбригад «Молодость выбирает здоровье»',
-              goal: 'Показать ценность здоровья через творческое выступление.',
-              stations: [
-                { n: '✍️ Подготовка', d: 'Каждый класс разрабатывает сценарий, готовит костюмы.' },
-                { n: '🎭 Выступление', d: 'Агитбригада — динамичная, эмоциональная, поучительная. Задействован весь класс.' },
-                { n: '🏆 Награждение', d: 'Победитель получает бесплатную экскурсию в этнокомплекс «Брянское Подворье».' },
-              ],
-              finale: 'Победитель фестиваля — бесплатная экскурсия в с. Белогорщь.'
-            },
-            {
-              color: '#9C27B0', emoji: '⚗️', date: '25 мая',
-              title: 'Защита проектов «Битва Титанов: Витамин vs Никотин»',
-              goal: 'Сформировать устойчивое негативное отношение к курению.',
-              stations: [
-                { n: '💊 Команда «Витамин»', d: '«Химия здоровья», «Влияние спорта на мозг», «Правильное питание», «Психология зависимости».' },
-                { n: '🚬 Команда «Никотин»', d: '«Мифы о вейпах», «История табака», «Маркетинг табачных компаний», «Портрет зависимого».' },
-                { n: '🎨 Реквизит', d: 'Плакаты, презентации, модели лёгких, видеоролики, костюмы.' },
-              ],
-              finale: 'Форум «Родные Любимые» с родителями. Проекты — неделю в школьном медиа-центре.'
-            },
-          ].map((e, i) => (
-            <div key={i} className="rounded-3xl overflow-hidden border-2 shadow-sm" style={{ borderColor: `${e.color}44` }}>
-              <div className="p-6 text-white" style={{ background: `linear-gradient(135deg,${e.color},${e.color}BB)` }}>
-                <div className="flex items-start gap-4">
-                  <div className="text-5xl">{e.emoji}</div>
-                  <div>
-                    <p className="text-sm opacity-80 mb-0.5">Ключевое дело №{i+1} · {e.date}</p>
-                    <h3 className="font-serif text-2xl font-600">{e.title}</h3>
-                    <p className="text-sm opacity-85 mt-1">Цель: {e.goal}</p>
+                { color:'#FF5B5B', bg:'#FFF0F0', emoji:'🌿', date:'7 апреля', title:'Фестиваль здоровья', sub:'«Гармония духа и тела»', desc:'4 интерактивных станции: Истоки здоровья, Голубь благой вести, Движение — жизнь!, Хлеб да соль. Финал: ритуал выпускания голубей + флешмоб.' },
+                { color:'#4CAF50', bg:'#F0FFF4', emoji:'🎤', date:'28 апреля', title:'Фестиваль агитбригад', sub:'«Молодость выбирает здоровье»', desc:'Каждый класс — динамичная агитбригада с костюмами и сценарием. Победитель: экскурсия в этнокомплекс «Брянское Подворье».' },
+                { color:'#9C27B0', bg:'#F9F0FF', emoji:'⚗️', date:'25 мая', title:'Защита проектов', sub:'«Битва Титанов: Витамин vs Никотин»', desc:'Публичная защита проектов на форуме «Родные Любимые» с родителями. Команды «Витамин» и «Никотин». Проекты неделю в медиа-центре.' },
+              ].map((e,i) => (
+                <div key={i} style={{ display:'flex', gap:'3mm', padding:'2.5mm 0', borderBottom: i<2 ? '1px solid #F0EAF8' : 'none' }}>
+                  <div style={{ width:'18mm', flexShrink:0 }}>
+                    <div style={{ background:e.bg, borderRadius:'5px', padding:'2mm', textAlign:'center', border:`1.5px solid ${e.color}44` }}>
+                      <div style={{ fontSize:'14pt' }}>{e.emoji}</div>
+                      <div style={{ fontSize:'6pt', fontWeight:700, color:e.color, lineHeight:1.2 }}>{e.date}</div>
+                    </div>
+                  </div>
+                  <div style={{ flex:1 }}>
+                    <div style={{ fontSize:'8pt', fontWeight:700, color:e.color }}>{e.title}</div>
+                    <div style={{ fontSize:'7pt', fontStyle:'italic', color:'#666', marginBottom:'1mm' }}>{e.sub}</div>
+                    <div style={{ fontSize:'7pt', color:'#444', lineHeight:1.5 }}>{e.desc}</div>
                   </div>
                 </div>
+              ))}
+            </div>
+
+            {/* Проблемные вопросы */}
+            <div style={{ background:'white', borderRadius:'6px', padding:'4mm', border:'1.5px solid #EDE0FF', boxShadow:'0 1px 6px rgba(0,0,0,0.06)' }}>
+              <div style={{ fontSize:'6pt', textTransform:'uppercase', letterSpacing:'1.5px', color:'#FF9933', fontWeight:700, marginBottom:'2mm' }}>💬 Проблемные вопросы (открытый микрофон)</div>
+              <div style={{ background:'#FFFBEA', borderRadius:'5px', padding:'2.5mm', marginBottom:'2mm', borderLeft:'3px solid #FFD700' }}>
+                <div style={{ fontSize:'7pt', fontStyle:'italic', color:'#8B6914' }}>«Здоровье — это тот подарок, который можно подарить себе, а можно и отнять у самого себя» — Ф. де Ларошфуко</div>
               </div>
-              <div className="p-5 bg-white">
-                <div className="grid grid-cols-2 gap-3 mb-4">
-                  {e.stations.map((s, j) => (
-                    <div key={j} className="rounded-xl p-4 border" style={{ borderColor: `${e.color}33`, background: `${e.color}08` }}>
-                      <p className="font-600 text-sm text-gray-700 mb-1">{s.n}</p>
-                      <p className="text-xs text-gray-500 leading-relaxed">{s.d}</p>
-                    </div>
-                  ))}
+              {[
+                'Встречались ли тебе люди, которые добровольно «отнимали у себя» здоровье, поддаваясь сиюминутным желаниям? Почему они это делали?',
+                'В какой момент вредная привычка превращается из личного дела в проблему близких?',
+                'Что сложнее: вернуть здоровье после злоупотребления или беречь то, что дано от природы?',
+              ].map((q,i) => (
+                <div key={i} style={{ display:'flex', gap:'2mm', padding:'1.5mm 0', borderBottom: i<2?'1px solid #FFF0E0':undefined }}>
+                  <span style={{ fontSize:'8pt', fontWeight:800, color:PETAL_COLORS[i*2], flexShrink:0, width:'5mm', textAlign:'center' }}>{i+1}</span>
+                  <span style={{ fontSize:'7.5pt', color:'#444', lineHeight:1.5 }}>{q}</span>
                 </div>
-                <div className="rounded-xl p-4 border-2" style={{ borderColor: `${e.color}55`, background: `${e.color}10` }}>
-                  <p className="text-xs font-700 uppercase tracking-wide mb-1" style={{ color: e.color }}>🏁 Финал</p>
-                  <p className="text-sm text-gray-700">{e.finale}</p>
-                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* КОЛОНКА 3 */}
+          <div style={{ display:'flex', flexDirection:'column', gap:'3mm' }}>
+
+            {/* Календарь */}
+            <div style={{ background:'white', borderRadius:'6px', padding:'4mm', border:'1.5px solid #EDE0FF', boxShadow:'0 1px 6px rgba(0,0,0,0.06)' }}>
+              <div style={{ fontSize:'6pt', textTransform:'uppercase', letterSpacing:'1.5px', color:'#2196F3', fontWeight:700, marginBottom:'2mm' }}>📅 Календарь учебного периода</div>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'2mm' }}>
+                {[
+                  { d:'7 апреля', e:'День Здоровья, Благовещенье', c:'#FF5B5B' },
+                  { d:'14 апреля', e:'День воздушного шара', c:'#FF9933' },
+                  { d:'22 апреля', e:'День Матери-Земли', c:'#FFD700' },
+                  { d:'28 апреля', e:'День скорой помощи', c:'#4CAF50' },
+                  { d:'7 мая', e:'День радио', c:'#2196F3' },
+                  { d:'9 мая', e:'День Победы', c:'#9C27B0' },
+                  { d:'25 мая', e:'День химика', c:'#E91E8C' },
+                  { d:'31 мая', e:'Всемирный день без табака', c:'#FF5B5B' },
+                ].map((c,i) => (
+                  <div key={i} style={{ background:`${c.c}12`, border:`1px solid ${c.c}44`, borderRadius:'5px', padding:'2mm 2.5mm' }}>
+                    <div style={{ fontSize:'7.5pt', fontWeight:700, color:c.c }}>{c.d}</div>
+                    <div style={{ fontSize:'7pt', color:'#444', lineHeight:1.3 }}>{c.e}</div>
+                  </div>
+                ))}
               </div>
             </div>
-          ))}
-        </div>
-      )}
 
-      {/* ВОПРОСЫ */}
-      {tab === 'questions' && (
-        <div className="max-w-3xl mx-auto p-6">
-          <div className="rounded-2xl p-6 mb-6 border-2 border-yellow-300 bg-yellow-50 text-center">
-            <p className="font-serif text-xl italic text-yellow-800">
-              «Здоровье — это тот подарок, который можно подарить себе, а можно и отнять у самого себя»
-            </p>
-            <p className="text-sm text-yellow-600 mt-2 font-600">— Франсуа де Ларошфуко</p>
-            <p className="text-xs text-yellow-500 mt-3">Формат ответов: открытый микрофон — за день до каждого ключевого дела</p>
-          </div>
-          <div className="space-y-4">
-            {QUESTIONS.map((q, i) => (
-              <div key={i} className="rounded-2xl p-6 bg-white border border-purple-100 shadow-sm flex gap-5 items-start">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-display text-2xl font-700 shrink-0"
-                  style={{ background: PETAL_COLORS[i * 2] }}>{i + 1}</div>
-                <div>
-                  <p className="text-gray-700 leading-relaxed font-500">{q}</p>
-                </div>
+            {/* Книга */}
+            <div style={{ background:'linear-gradient(135deg,#FFF8E1,#FFF3CD)', borderRadius:'6px', padding:'4mm', border:'2px solid #FFD70055' }}>
+              <div style={{ fontSize:'6pt', textTransform:'uppercase', letterSpacing:'1.5px', color:'#F57F17', fontWeight:700, marginBottom:'2mm' }}>📚 Книга учебного периода</div>
+              <div style={{ fontSize:'10pt', fontWeight:700, color:'#4A3000', fontFamily:"'Cormorant','serif'", lineHeight:1.3 }}>«Цветик-семицветик»</div>
+              <div style={{ fontSize:'8pt', color:'#7A5C00', marginTop:'1mm' }}>Валентин Катаев</div>
+            </div>
+
+            {/* Рефлексия */}
+            <div style={{ background:'white', borderRadius:'6px', padding:'4mm', border:'1.5px solid #EDE0FF', boxShadow:'0 1px 6px rgba(0,0,0,0.06)' }}>
+              <div style={{ fontSize:'6pt', textTransform:'uppercase', letterSpacing:'1.5px', color:'#D97A8E', fontWeight:700, marginBottom:'2mm' }}>🎒 Рефлексия · 31 мая — Поход с классом</div>
+              <div style={{ fontSize:'7.5pt', color:'#555', lineHeight:1.5, marginBottom:'2.5mm' }}>
+                Все классы с классным руководителем и родителями идут в однодневный поход. Во время привала — игра «Чемодан, мясорубка, корзина».
               </div>
-            ))}
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:'2mm' }}>
+                {[
+                  { e:'🧳', n:'Чемодан', d:'Ценное — заберу с собой в жизнь', c:'#4CAF50' },
+                  { e:'⚙️', n:'Мясорубка', d:'Нужно обдумать и переработать', c:'#FF9933' },
+                  { e:'🗑️', n:'Корзина', d:'Показалось ненужным', c:'#FF5B5B' },
+                ].map(r => (
+                  <div key={r.n} style={{ background:`${r.c}10`, border:`1.5px solid ${r.c}44`, borderRadius:'5px', padding:'2.5mm', textAlign:'center' }}>
+                    <div style={{ fontSize:'16pt', lineHeight:1 }}>{r.e}</div>
+                    <div style={{ fontSize:'7.5pt', fontWeight:700, color:r.c, marginTop:'1mm' }}>{r.n}</div>
+                    <div style={{ fontSize:'6.5pt', color:'#666', marginTop:'1mm', lineHeight:1.3 }}>{r.d}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Цитата */}
+            <div style={{ background:'linear-gradient(135deg,#F3E5F5,#FCE4EC)', borderRadius:'6px', padding:'4mm 5mm', border:'2px solid #CE93D855', textAlign:'center' }}>
+              <div style={{ fontSize:'9pt', fontStyle:'italic', color:'#4A148C', lineHeight:1.6, fontFamily:"'Cormorant','serif'" }}>
+                «Здоровье — это тот подарок, который можно подарить себе, а можно и отнять у самого себя»
+              </div>
+              <div style={{ fontSize:'7.5pt', color:'#880E4F', marginTop:'1.5mm', fontWeight:600 }}>— Франсуа де Ларошфуко</div>
+            </div>
+
+            {/* Сюжет лепестков */}
+            <div style={{ background:'white', borderRadius:'6px', padding:'4mm', border:'1.5px solid #EDE0FF', boxShadow:'0 1px 6px rgba(0,0,0,0.06)', flex:1 }}>
+              <div style={{ fontSize:'6pt', textTransform:'uppercase', letterSpacing:'1.5px', color:'#9C27B0', fontWeight:700, marginBottom:'2mm' }}>🌸 Механика «Цветика-семицветика»</div>
+              <div style={{ display:'flex', flexWrap:'wrap', gap:'2mm', justifyContent:'center', marginBottom:'2mm' }}>
+                {PETAL_COLORS.map((c,i) => (
+                  <div key={i} style={{ width:'9mm', height:'15mm', borderRadius:'50% 50% 50% 50% / 60% 60% 40% 40%', background:c, opacity:0.85, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                    <span style={{ color:'white', fontSize:'7pt', fontWeight:700 }}>{i+1}</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{ fontSize:'7pt', color:'#555', lineHeight:1.6 }}>
+                7 лепестков = 7 коллективных бонусов для класса.<br/>
+                ✅ Сохранить лепесток: участие в коллективных делах<br/>
+                ❌ Потерять лепесток: проступок одного ученика<br/>
+                🎁 Бонусы используются в следующем учебном году
+              </div>
+            </div>
+
+            {/* Подпись */}
+            <div style={{ fontSize:'6.5pt', color:'#999', textAlign:'center', paddingTop:'1mm' }}>
+              МОУ-СОШ №2 · г. Унеча · IV четверть 2024–2025 · ИИ: gigachat (max.ru)
+            </div>
           </div>
         </div>
-      )}
-    </div>
+      </div>
+
+      {/* CSS для печати */}
+      <style>{`
+        @page {
+          size: A3 landscape;
+          margin: 0;
+        }
+        @media print {
+          html, body {
+            margin: 0;
+            padding: 0;
+            width: 420mm;
+            height: 297mm;
+          }
+          #a3-poster {
+            width: 420mm !important;
+            min-height: 297mm !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+            page-break-after: avoid;
+          }
+        }
+      `}</style>
+    </>
   );
 }
